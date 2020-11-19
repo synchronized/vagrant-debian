@@ -46,8 +46,8 @@ Vagrant.configure("2") do |config|
   # argument is a set of non-required options.
   # config.vm.synced_folder "../../../", "/workspace", owner: "sunday",
   #     group: "sunday", mount_options: ["fmask=133", "dmask=022"]
-  config.vm.synced_folder ".", "/vagrant", owner: "sunday",
-      group: "sunday", mount_options: ["fmask=133", "dmask=022"]
+  # config.vm.synced_folder ".", "/vagrant", owner: "sunday",
+  #     group: "sunday", mount_options: ["fmask=133", "dmask=022"]
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
