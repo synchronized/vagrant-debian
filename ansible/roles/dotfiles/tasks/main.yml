@@ -1,0 +1,157 @@
+---
+- debug: msg="/home/{{ user }}/.dotfiles"
+- name: git clone dotfiles
+  become: yes
+  become_user: "{{ user }}"
+  retries: 3
+  delay: 3
+  git:
+    dest: "/home/{{ user }}/.dotfiles"
+    repo: https://github.com/synchronized/dotfiles.git
+    depth: 1
+    recursive: yes
+- debug: msg="/home/{{ user }}/{{ item.src }} -> /home/{{ user }}/.dotfiles/{{ item.dest }} ."
+  with_items: "{{ linkfiles }}"
+- name: create dotfiles link
+  become: yes
+  become_user: "{{ user }}"
+  file: 
+    group: "{{ user }}" 
+    owner: "{{ user }}"
+    src: "/home/{{ user }}/.dotfiles/{{ item.src }}"
+    dest: "/home/{{ user }}/{{ item.dest }}"
+    state: link
+  with_items: "{{ linkfiles }}"
+
+- debug: config /home/{{ user }}/.bashrc {{ item }}
+  with_file:
+    - bashrc
+- name: config /home/{{ user }}/.bashrc
+  become: yes
+  become_user: "{{ user }}"
+  lineinfile:
+    dest: "/home/{{ user }}/.bashrc" 
+    line: "{{ item }}"
+  with_file:
+    - bashrc
+
+- name: git clone spacemacs
+  become: yes
+  become_user: "{{ user }}"
+  retries: 3
+  delay: 3
+  git:
+    dest: "/home/{{ user }}/.emacs.d"
+    repo: https://github.com/syl20bnr/spacemacs
+    version: develop
+    depth: 1
+
+- name: git clone fzf
+  become: yes
+  become_user: "{{ user }}"
+  retries: 3
+  delay: 3
+  git:
+    dest: "/home/{{ user }}/.fzf"
+    repo: https://github.com/junegunn/fzf.git
+    depth: 1
+- name: install fzf
+  become: yes
+  become_user: "{{ user }}"
+  retries: 3
+  delay: 3
+  command: ~/.fzf/install --key-bindings --completion --no-update-rc
+
+- name: install nvm
+  become: yes
+  become_user: "{{ user }}"
+  retries: 3
+  delay: 3
+  shell: >
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | bash
+  args:
+    creates: "/home/{{ user }}/.nvm/nvm.sh"
+- name: install nvm-node
+  become: yes
+  become_user: "{{ user }}"
+  retries: 3
+  delay: 3
+  shell: >
+    source /home/{{ user }}/.nvm/nvm.sh && nvm install --lts=erbium && nvm alias default node
+  args:
+    executable: /bin/bash
+
+- name: install gvm
+  become: yes
+  become_user: "{{ user }}"
+  retries: 3
+  delay: 3
+  shell: >
+    curl -s -S -L -o- https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer | bash
+  args:
+    creates: "/home/{{ user }}/.gvm/scripts/gvm"
+- name: gvm install go1.4
+  become: yes
+  become_user: "{{ user }}"
+  retries: 3
+  delay: 3
+  shell: >
+    gvm install go1.4 -B
+  args:
+    executable: /bin/zsh
+- name: gvm install go1.10
+  become: yes
+  become_user: "{{ user }}"
+  retries: 3
+  delay: 3
+  shell: >
+    gvm install go1.10 && gvm use go1.10 --default
+  args:
+    executable: /bin/zsh
+- name: gvm install go1.13
+  become: yes
+  become_user: "{{ user }}"
+  retries: 3
+  delay: 3
+  shell: >
+    gvm install go1.13
+  args:
+    executable: /bin/zsh
+
+- name: install pyenv
+  become: yes
+  become_user: "{{ user }}"
+  retries: 3
+  delay: 3
+  git:
+    dest: "/home/{{ user }}/.pyenv"
+    repo: https://github.com/pyenv/pyenv.git
+    depth: 1
+- name: install pyenv virtualenv
+  become: yes
+  become_user: "{{ user }}"
+  retries: 3
+  delay: 3
+  git:
+    dest: "/home/{{ user }}/.pyenv/plugins/pyenv-virtualenv"
+    repo: https://github.com/pyenv/pyenv-virtualenv.git
+    depth: 1
+
+- name: install plenv
+  become: yes
+  become_user: "{{ user }}"
+  retries: 3
+  delay: 3
+  git:
+    dest: "/home/{{ user }}/.plenv"
+    repo: https://github.com/tokuhirom/plenv.git
+    depth: 1
+
+- name: install vim plugins
+  become: yes
+  become_user: "{{ user }}"
+  shell: >
+    /home/{{ user }}/.vim/install.sh
+  args:
+    executable: /bin/bash
+  ignore_errors: yes

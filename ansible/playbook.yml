@@ -1,0 +1,24 @@
+---
+- name: Test Playbook...
+  hosts: localhost
+  become: yes
+  gather_facts: no
+  vars:
+    user: sunday
+    publickeyfile: /vagrant/key/sunday.pub
+    packagelist:
+      - curl
+      - wget
+      - acl
+      - xauth
+      - git
+      - zsh
+      - vim
+      - direnv 
+      - tmux
+      - emacs
+      - ranger
+      - xsel
+      - xclip
+  roles:
+    - role: dotfiles
